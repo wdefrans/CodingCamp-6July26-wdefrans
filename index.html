@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Expense & Budget Visualizer</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <div class="app">
+
+    <!-- Header -->
+    <header class="app-header">
+      <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark / light mode" aria-label="Toggle theme">🌙</button>
+      <h1 class="app-title">💰 Budget Tracker</h1>
+      <p class="app-subtitle">Track your spending, stay on budget</p>
+    </header>
+
+    <!-- Balance Card -->
+    <section class="balance-section">
+      <div class="balance-card">
+        <div class="balance-item">
+          <span class="balance-label">Total Balance</span>
+          <span class="balance-amount" id="total-balance">$0.00</span>
+        </div>
+        <div class="balance-divider"></div>
+        <div class="balance-item">
+          <span class="balance-label income-label">+ Income</span>
+          <span class="balance-amount income-amount" id="total-income">$0.00</span>
+        </div>
+        <div class="balance-divider"></div>
+        <div class="balance-item">
+          <span class="balance-label expense-label">− Expenses</span>
+          <span class="balance-amount expense-amount" id="total-expense">$0.00</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Budget Goal -->
+    <section class="budget-section">
+      <div class="budget-card">
+        <div class="budget-header">
+          <span class="budget-title">Monthly Budget</span>
+          <div class="budget-header-actions">
+            <button class="budget-edit-btn" id="limit-edit-btn" title="Set spending limit per transaction">⚠️</button>
+            <button class="budget-edit-btn" id="budget-edit-btn" title="Set budget">✏️</button>
+          </div>
+        </div>
+        <div class="budget-bar-wrap">
+          <div class="budget-bar" id="budget-bar">
+            <div class="budget-bar-fill" id="budget-bar-fill"></div>
+          </div>
+          <span class="budget-percent" id="budget-percent">0%</span>
+        </div>
+        <div class="budget-meta">
+          <span id="budget-spent-label">$0.00 spent</span>
+          <span id="budget-goal-label">of $0.00</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Add Transaction Form -->
+    <section class="form-section">
+      <div class="form-card">
+        <h2 class="form-title">Add Transaction</h2>
+        <form id="transaction-form" novalidate>
+
+          <!-- Type Toggle -->
+          <div class="type-toggle">
+            <button type="button" class="type-btn active" data-type="expense" id="btn-expense">Expense</button>
+            <button type="button" class="type-btn" data-type="income" id="btn-income">Income</button>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="txn-desc">Description</label>
+              <input type="text" id="txn-desc" placeholder="e.g. Coffee, Salary..." maxlength="50" />
+            </div>
+          </div>
+
+          <div class="form-row two-col">
+            <div class="form-group">
+              <label for="txn-amount">Amount ($)</label>
+              <input type="number" id="txn-amount" placeholder="0.00" min="0.01" step="0.01" />
+            </div>
+            <div class="form-group">
+              <label for="txn-date">Date</label>
+              <input type="date" id="txn-date" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="txn-category">Category</label>
+              <select id="txn-category">
+                <option value="Food">🍔 Food & Dining</option>
+                <option value="Transport">🚗 Transport</option>
+                <option value="Shopping">🛍️ Shopping</option>
+                <option value="Entertainment">🎮 Entertainment</option>
+                <option value="Health">💊 Health</option>
+                <option value="Housing">🏠 Housing</option>
+                <option value="Utilities">💡 Utilities</option>
+                <option value="Education">📚 Education</option>
+                <option value="Salary">💼 Salary</option>
+                <option value="Other">📦 Other</option>
+              </select>
+            </div>
+          </div>
+
+          <button type="submit" class="submit-btn" id="submit-btn">Add Expense</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- Category Chart -->
+    <section class="chart-section">
+      <div class="chart-card">
+        <h2 class="section-title">Spending by Category</h2>
+        <div class="chart-wrap">
+          <canvas id="category-chart" width="260" height="260"></canvas>
+          <div class="chart-empty" id="chart-empty">No expense data yet</div>
+        </div>
+        <div class="chart-legend" id="chart-legend"></div>
+      </div>
+    </section>
+
+    <!-- Transaction History -->
+    <section class="history-section">
+      <div class="history-card">
+        <div class="history-header">
+          <h2 class="section-title">Transactions</h2>
+          <div class="history-controls">
+            <select id="sort-transactions" class="filter-select">
+              <option value="newest">Newest</option>
+              <option value="oldest">Oldest</option>
+              <option value="amount-desc">Amount (High → Low)</option>
+              <option value="amount-asc">Amount (Low → High)</option>
+              <option value="category-az">Category (A–Z)</option>
+            </select>
+            <select id="filter-category" class="filter-select">
+              <option value="all">All Categories</option>
+              <option value="Food">Food</option>
+              <option value="Transport">Transport</option>
+              <option value="Shopping">Shopping</option>
+              <option value="Entertainment">Entertainment</option>
+              <option value="Health">Health</option>
+              <option value="Housing">Housing</option>
+              <option value="Utilities">Utilities</option>
+              <option value="Education">Education</option>
+              <option value="Salary">Salary</option>
+              <option value="Other">Other</option>
+            </select>
+            <button class="clear-btn" id="clear-all-btn" title="Clear all transactions">🗑️ Clear</button>
+          </div>
+        </div>
+        <div class="transaction-list" id="transaction-list">
+          <div class="empty-state" id="empty-state">
+            <span class="empty-icon">📭</span>
+            <p>No transactions yet.<br/>Add one above to get started!</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div><!-- end .app -->
+
+  <!-- Budget Modal -->
+  <div class="modal-overlay" id="budget-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal">
+      <h3 id="modal-title">Set Monthly Budget</h3>
+      <input type="number" id="budget-input" placeholder="Enter budget amount" min="1" step="1" />
+      <div class="modal-actions">
+        <button class="modal-cancel" id="modal-cancel">Cancel</button>
+        <button class="modal-save" id="modal-save">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Spending Limit Modal -->
+  <div class="modal-overlay" id="limit-modal" role="dialog" aria-modal="true" aria-labelledby="limit-modal-title">
+    <div class="modal">
+      <h3 id="limit-modal-title">⚠️ Set Spending Limit</h3>
+      <p class="modal-hint">Transactions above this amount will be highlighted.</p>
+      <input type="number" id="limit-input" placeholder="Enter limit per transaction" min="0.01" step="0.01" />
+      <div class="modal-actions">
+        <button class="modal-cancel" id="limit-modal-cancel">Cancel</button>
+        <button class="modal-save" id="limit-modal-save">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirm Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
