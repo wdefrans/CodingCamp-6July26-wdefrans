@@ -111,9 +111,11 @@ const elToast         = $('toast');
    FORMATTING HELPERS
    ============================================================ */
 function fmtCurrency(val) {
-  return '$' + Math.abs(val).toLocaleString('en-US', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
+  return Math.abs(val).toLocaleString("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
   });
 }
 
